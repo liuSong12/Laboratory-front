@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router"
 import routesItem from './config.js'
 import { useRouterStore } from "../store/useRouterStore.js"
+import { useUserStore } from "../store/useUserStore.js"
 
 
 const routes = [
@@ -9,11 +10,11 @@ const routes = [
         name: 'login',
         component: () => import('../views/Login.vue')
     },
-    {
-        path: '/mainbox',
-        name: 'mainbox',
-        component: () => import('../views/MainBox.vue')
-    }
+    // {
+    //     path: '/mainbox',
+    //     name: 'mainbox',
+    //     component: () => import('../views/MainBox.vue')
+    // }
 ]
 
 
@@ -25,12 +26,12 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const { isGetterRouter } = useRouterStore()
+    const { user } = useUserStore()
 
     if (to.path === '/login') {
         next();
     } else {
-        let token = localStorage.getItem('token');
-        if (token === null || token === '') {
+        if (!user.role) {
             // 未登录
             next({
                 path: 'login'
@@ -38,11 +39,13 @@ router.beforeEach((to, from, next) => {
         } else {
             // 已登录
             if (!isGetterRouter) {
+                // remove mainbox route
+                router.removeRoute("mainbox")
                 configRoute()
                 next({
                     path: to.fullPath
                 })
-            }else{
+            } else {
                 next();
             }
         }
@@ -50,10 +53,14 @@ router.beforeEach((to, from, next) => {
 });
 
 function configRoute() {
+    router.addRoute({
+        path: "/mainbox",
+        name: "mainbox",
+        component: () => import('../views/MainBox.vue')
+    })
     const { changeIsGetterRouter } = useRouterStore()
-
     routesItem.forEach(item => {
-        router.addRoute("mainbox", item)
+        checkPermission(item.path) && router.addRoute("mainbox", item)
     })
 
     // 重定向
@@ -68,8 +75,13 @@ function configRoute() {
         name: "not-found",
         component: () => import('../views/notfound/NotFound.vue')
     })
-    
+
     changeIsGetterRouter(true)
+}
+
+const checkPermission = (path) => {
+    const { user } = useUserStore()
+    return user.role.rights.includes(path)
 }
 
 export default router;

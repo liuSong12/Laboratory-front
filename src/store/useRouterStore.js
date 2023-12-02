@@ -11,4 +11,6 @@ export const useRouterStore = defineStore("router", () => {
         isGetterRouter,
         changeIsGetterRouter
     }
+},{
+    persist: false // If you want to persist state
 })
