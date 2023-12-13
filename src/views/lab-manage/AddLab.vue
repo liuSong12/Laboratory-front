@@ -3,21 +3,28 @@
 
     <div style="height:100%; justify-content: center;position: relative" id="map"></div>
 
-    <el-dialog :model-value="dialogVisible" width="30%">
+    <el-dialog :model-value="dialogVisible" width="30%" @close="dialogVisible = false">
       <template #header>
         <span>添加实验室</span>
       </template>
       <div>
-        <el-form :model="labForm" ref="labFormRef" :rules="rules">
+        <el-form :model="labForm" ref="labFormRef" :rules="rules" label-width="100px">
           <el-form-item label="实验室名称" prop="labName">
             <el-input v-model="labForm.labName"></el-input>
           </el-form-item>
-          <el-form-item label="容纳人数" prop="capacity" style="margin-left: 13px;">
-            <el-input v-model="labForm.capacity" type="number"></el-input>
+          <el-form-item label="容纳人数" prop="capacity">
+            <el-input-number size="small" v-model="labForm.capacity" :min="15"></el-input-number>
           </el-form-item>
-          <el-form-item label="实验室类型" prop="labType">
-            <el-select v-model="labForm.labType" placeholder="请选择实验室类型">
-              <el-option v-for="item in labType" :key="item.id" :label="item.label" :value="item.value"></el-option>
+          <el-form-item label="实验室类型" prop="labId">
+            <el-select v-model="labForm.labId" placeholder="请选择实验室类型" style="width: 100%;">
+              <el-option v-for="item in labAndCollegeList.labTypeNameList" :key="item.id" :label="item.labTypeName"
+                :value="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="所属学院" prop="collegeId">
+            <el-select v-model="labForm.collegeId" placeholder="请选择实验室所属学院" style="width: 100%;">
+              <el-option v-for="item in labAndCollegeList.labCollegeNameList" :key="item.id" :label="item.labCollegeName"
+                :value="item.id"></el-option>
             </el-select>
           </el-form-item>
         </el-form>
@@ -26,7 +33,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary">
+          <el-button type="primary" @click="handleAddLab">
             确认
           </el-button>
         </span>
@@ -41,32 +48,20 @@
 import { Scene, Popup, PointLayer } from '@antv/l7';
 import { GaodeMap } from '@antv/l7-maps';
 import { onMounted, ref, reactive } from "vue"
+import axios from "axios"
 
 const dialogVisible = ref(false)
+const labFormRef = ref(null)
+const labAndCollegeList = ref({})
+
 
 const labForm = reactive({
   labName: '',
-  capacity: '',
-  labType: [{
-    id: 1,
-    label: "物理实验室",
-    value: 1
-  },
-  {
-    id: 2,
-    label: "化学实验室",
-    value: 2
-  },
-  {
-    id: 3,
-    label: "生物实验室",
-    value: 3
-  },
-  {
-    id: 4,
-    label: "科学实验室",
-    value: 4
-  }]
+  capacity: 0,
+  labId: '',
+  collegeId: '',
+  lat: 0,
+  lng: 0
 })
 
 
@@ -74,27 +69,42 @@ const labForm = reactive({
 
 const rules = reactive({
   labName: [
-    { required: true, message: '请输入实验室名称',trigger:'blur' }
+    { required: true, message: '请输入实验室名称', trigger: 'blur' }
   ],
   capacity: [
-    { required: true, message: '请输入实验室容纳人数',trigger:'blur' }
+    { required: true, message: '请输入实验室容纳人数', trigger: 'blur' }
   ],
-  labType: [
-    { required: true, message: '请输入实验室类型',trigger:'blur' }
+  labId: [
+    { required: true, message: '请输入实验室类型', trigger: 'blur' }
+  ],
+  collegeId: [
+    { required: true, message: '请选择实验室所属学院', trigger: 'blur' }
   ]
 })
 
+const handleAddLab = () => {
+  labFormRef.value.validate(async valid => {
+    if (!valid) return;
+    let res = await axios.post("/adminapi/labs", labForm)
+    if (res.data.code !== 0) return;
+    initOringinPoint()
+    dialogVisible.value = false
 
-
-
-
-
+  })
+}
 
 onMounted(() => {
   initMap()
+  getType()
 })
 
-let scene;
+const getType = async () => {
+  let res = await axios.get("/adminapi/labs")
+  if (res.data.code !== 0) return;
+  labAndCollegeList.value = res.data.data
+}
+
+let scene, popup;
 
 function initMap() {
   scene = new Scene({
@@ -108,63 +118,39 @@ function initMap() {
     })
   });
 
-  const initPop = () => {
+  const initPop = async () => {
     window.screen = scene
+    await initOringinPoint()
     scene.on("click", e => {
-      console.log(e)
       const { lat, lng } = e.lnglat
-      const popup = new Popup({
+      popup = new Popup({
         // 初始锚点经纬度
-        // offsets: [0, 0],
-        // lngLat: {
-        //   lng: 102.748881,
-        //   lat: 25.128499,
-        // },
         lngLat: e.lnglat,
-        // Popup 标题
         title: '实验室',
-        // Popup 内容
         html: `<button class="el-button el-button--primary" onclick="add_popup(${lat},${lng})">添加</button>`
       });
-
-      // 更新 Popup 内容
-      // popup.setHTML('位置');
-      // popup.setLngLat(e.lngLat)
       scene.addPopup(popup);
-      // 更新 Popup 锚点经纬度
-      // popup.setLngLat({
-      //   lng: 130,
-      //   lat: 40,
-      // });
-
     })
   }
   scene.on('loaded', initPop);
 }
 
-window.add_popup = (lat, lng) => {
-  dialogVisible.value = true
-  return;
-  //经纬度
-  //下面的x，y要经纬度与中心点的比例
+//拿到本来存在的点
+const initOringinPoint = async () => {
+  let res = await axios.get("/adminapi/labs/getPoints")
+  if (res.data.code !== 0) return;
   const textlayer = new PointLayer({ zIndex: 2 })
     .source(
-      [
-        {
-          x: lng,
-          y: lat,
-          text: "小屋"
-        }
-      ],
+      res.data.data,
       {
         parser: {
           type: 'json',
-          x: 'x',
-          y: 'y'
+          x: 'lng',
+          y: 'lat'
         }
       }
     )
-    .shape('text', 'text')
+    .shape('labName', 'text')
     .size(16)
     .active({
       color: '#00f',
@@ -181,6 +167,15 @@ window.add_popup = (lat, lng) => {
       textAllowOverlap: true
     });
   scene.addLayer(textlayer);
+}
+
+//pop弹出点击事件
+window.add_popup = (lat, lng) => {
+  labForm.lat = lat
+  labForm.lng = lng
+  //将pop隐藏
+  popup.close()
+  dialogVisible.value = true
 }
 
 

@@ -17,7 +17,7 @@ window.addEventListener("online", () => {
     //网络监测
     const { downlink, rtt } = navigator.connection //下载速度MB/s， 延迟ms
     ElMessage({
-        message: `网络恢复:网速：${downlink}Mb/s,延迟：${rtt}ms`,
+        message: `网络恢复：网速：${downlink}Mb/s,延迟：${rtt}ms`,
         type: 'success',
     })
 })
@@ -26,7 +26,7 @@ window.addEventListener("offline", () => {
     //网络监测
     const { downlink, rtt } = navigator.connection //下载速度MB/s， 延迟ms
     ElMessage({
-        message: `网络断开:网速：${downlink}Mb/s,延迟：${rtt}ms`,
+        message: `网络断开：网速：${downlink}Mb/s,延迟：${rtt}ms`,
         type: 'error',
     })
 })
@@ -35,7 +35,7 @@ navigator.connection.addEventListener("change", () => {
     const { effectiveType,downlink, rtt, } = navigator.connection //下载速度MB/s， 延迟ms
     if(downlink<0.4){
         ElMessage({
-            message: `网速低:网络：${effectiveType},网速：${downlink}Mb/s,延迟：${rtt}ms`,
+            message: `网速低：网络：${effectiveType},网速：${downlink}Mb/s,延迟：${rtt}ms`,
             type: 'warn'
         })
     }
