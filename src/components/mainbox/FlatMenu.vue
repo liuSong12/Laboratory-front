@@ -39,9 +39,9 @@ const props = defineProps({
 
 const mapIcon = { User, HomeFilled, List, Key, OfficeBuilding, UploadFilled }
 
-const { user } = useUserStore()
+const userStore = useUserStore()
 const checkAuth = (path) => {
-    return user.role.rights.includes(path)
+    return userStore.user.role && userStore.user.role.rights.includes(path)
 }
 
 

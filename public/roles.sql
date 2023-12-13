@@ -1,11 +1,12 @@
 CREATE TABLE roles (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    roleName VARCHAR(20) NOT NULL,
-    roleType INT NOT NULL,
-    rights JSON NOT NULL
+    role_name VARCHAR(20) NOT NULL,
+    role_type INT NOT NULL,
+    rights JSON NOT NULL,
+    delete INT DEFAULT 0
 );
 INSERT INTO
-    roles (roleName, roleType, rights)
+    roles (role_name, role_type, rights)
 VALUES
     (
         '管理员',
@@ -22,12 +23,13 @@ VALUES
             "/lab-manage/addlab",
             "/book-manage",
             "/book-manage/auditlist",
-            "/book-manage/booklist"
+            "/book-manage/booklist",
+            "/book-manage/addbook"
         ]'
     );
 
 INSERT INTO
-    roles (roleName, roleType, rights)
+    roles (role_name, role_type, rights)
 VALUES
     (
         '教师',
@@ -36,6 +38,7 @@ VALUES
              "/index",
             "/book-manage",
             "/book-manage/booklist",
+            "/book-manage/addbook",
             "/book-manage/addbook"
         ]'
     );

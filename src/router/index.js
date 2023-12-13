@@ -80,8 +80,8 @@ function configRoute() {
 }
 
 const checkPermission = (path) => {
-    const { user } = useUserStore()
-    return user.role.rights.includes(path)
+    const userStore = useUserStore()
+    return userStore.user.role.rights.includes(path)
 }
 
 export default router;

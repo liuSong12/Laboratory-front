@@ -5,7 +5,7 @@
 
                 <el-menu :default-active="route.path" class="el-menu-vertical-demo" style="height: 100vh;" :router="true">
 
-                    <FlatMenu :dataList="dataList" v-if="dataList.length"/>
+                    <FlatMenu :dataList="rightsStore.rightsList" v-if="rightsStore.rightsList.length" />
 
                 </el-menu>
 
@@ -17,23 +17,22 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import axios from "axios"
-import FlatMenu from './FlatMenu.vue'
-import {useRoute} from "vue-router"
+import FlatMenu from './FlatMenu.vue' 
+import { useRoute } from "vue-router"
+import { useRightsStore } from "../../store/useRightsStore"
 
-const dataList = ref([])
+const rightsStore = useRightsStore()
 
 const route = useRoute()
-console.log(route.path)
-console.log(route.fullPath)
+
 
 onMounted(() => {
-    getList()
+    rightsStore.rightsList.length === 0 && getList()
 })
 
 const getList = async () => {
     const res = await axios.get("/adminapi/rights")
-    console.log(res.data)
-    dataList.value = res.data
+    rightsStore.changeRights(res.data.data) 
 }
 
 

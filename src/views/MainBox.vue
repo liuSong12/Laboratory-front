@@ -6,7 +6,7 @@
                 <el-container direction="vertical">
                     <TopHeader />
                     <el-main style="padding-right: 0;">
-                        <el-scrollbar>
+                        <el-scrollbar style="height:100%;" >
                             <router-view></router-view>
                         </el-scrollbar>
                     </el-main>
