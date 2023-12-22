@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediaSource Example</title>
+</head>
+
+<body>
+    <video controls></video>
+    <!-- 
+    <script>
+        // 假设视频已经被分片成了多个部分，这里只是一个简单的例子
+        const videoParts = ['video_part1.mp4', 'video_part2.mp4', 'video_part3.mp4'];
+
+        const videoElement = document.querySelector('video');
+        const mediaSource = new MediaSource();
+
+        // 设置视频源
+        videoElement.src = URL.createObjectURL(mediaSource);
+
+        mediaSource.addEventListener('sourceopen', function () {
+            const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
+
+            function appendNextVideoPart() {
+                if (videoParts.length > 0) {
+                    const videoPart = videoParts.shift();
+                    fetch(videoPart)
+                        .then(response => response.arrayBuffer())
+                        .then(buffer => {
+                            sourceBuffer.addEventListener('updateend', function () {
+                                appendNextVideoPart();
+                            });
+                            sourceBuffer.appendBuffer(buffer);
+                        })
+                        .catch(error => console.error('Error fetching or decoding video part:', error));
+                } else {
+                    // 所有部分都已添加完毕，结束播放
+                    mediaSource.endOfStream();
+                }
+            }
+
+            appendNextVideoPart();
+        });
+
+        mediaSource.addEventListener('sourceended', function () {
+            console.log('Media source ended');
+        });
+
+        mediaSource.addEventListener('sourceclose', function () {
+            console.log('Media source closed');
+        });
+    </script> -->
+    <script>
+        // let b = new TextEncoder().encode('hello world');
+        // console.log(b)
+        // let c = new TextDecoder().decode(b)
+        // console.log(c)
+        // let r = new FileReader();
+        // r.onload = ()=>{
+        //     console.log(new Uint8Array(r.result))
+        // }
+
+        // let aa = new Uint8Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100]);
+        // console.log(Array.from(aa).map(item=>{
+        //     return String.fromCharCode(item)
+        // }).join(""))
+
+        // let bb = new Uint16Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100]);
+        // // console.log(bb)
+        // console.log(Array.from(bb).map(item=>{
+        //     return String.fromCharCode(item)
+        // }).join(""))
+
+        // let cc = new Uint32Array([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100]);
+        // // console.log(bb)
+        // console.log(Array.from(cc).map(item=>{
+        //     return String.fromCharCode(item)
+        // }).join(""))
+        // r.readAsArrayBuffer(new Blob(a))
+
+        // console.log(a)
+        // console.log(new TextDecoder().decode(a)) // 11 22 44
+
+        // crypto.subtle.digest('SHA-256', new TextEncoder().encode('hello world')).then(function (digest) {
+        //     let a = Array.from(new Uint8Array(digest))
+        //     console.log(a)
+        //     let b = a.map(item=>{
+        //         return item.toString(16).padStart(2,'0')
+        //     }).join("")
+        //     console.log(b)
+        // });
+
+
+        // crypto.subtle.digest('SHA-1', new TextEncoder().encode('hello world')).then(function (digest) {
+        //     let a = Array.from(new Uint16Array(digest))
+        //     console.log(a,1)
+        //     let b = a.map(item=>{
+        //         return item.toString(16).padStart(2,'0')
+        //     }).join("")
+        //     console.log(b)
+        // });
+
+
+
+        let text = "你好"
+        let encoded = new TextEncoder().encode(text)
+
+        crypto.subtle.digest("SHA-1",encoded).then(res=>{
+            let decoded = Array.from(new Uint8Array(res)).map(item=>{
+                return item.toString(16).padStart(2,"0")
+            }).join("")
+            console.log(decoded)
+        })
+    </script>
+</body>
+
+</html>

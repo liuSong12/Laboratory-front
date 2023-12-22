@@ -8,9 +8,11 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import Particles from "vue3-particles";
 import "./utils/axios.config"
+import 'element-plus/theme-chalk/dark/css-vars.css'
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
+
 
 createApp(App)
     .use(Particles)

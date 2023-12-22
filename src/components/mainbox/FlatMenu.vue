@@ -22,7 +22,6 @@
 
 
 <script setup>
-import { defineProps } from "vue"
 import { HomeFilled, User, List, Key, OfficeBuilding, UploadFilled } from '@element-plus/icons-vue'
 import FlatMenu from './FlatMenu.vue'
 import { useUserStore } from "../../store/useUserStore"

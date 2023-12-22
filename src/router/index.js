@@ -2,7 +2,8 @@ import { createRouter, createWebHashHistory } from "vue-router"
 import routesItem from './config.js'
 import { useRouterStore } from "../store/useRouterStore.js"
 import { useUserStore } from "../store/useUserStore.js"
-
+import nProgress from "nprogress"
+import "nprogress/nprogress.css"
 
 const routes = [
     {
@@ -27,6 +28,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     const { isGetterRouter } = useRouterStore()
     const { user } = useUserStore()
+    nProgress.start()
 
     if (to.path === '/login') {
         next();
@@ -51,6 +53,9 @@ router.beforeEach((to, from, next) => {
         }
     }
 });
+router.afterEach(() => {
+    nProgress.done()
+})
 
 function configRoute() {
     router.addRoute({

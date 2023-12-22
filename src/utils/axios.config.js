@@ -45,6 +45,10 @@ navigator.connection.addEventListener("change", () => {
 
 axios.interceptors.request.use(function (config) {
     // Do something before request is sent
+    const token = localStorage.getItem("token")
+    if(token){
+        config.headers["Authorization"] = token
+    }
     return config;
 }, function (error) {
     // Do something with request error
@@ -55,7 +59,10 @@ axios.interceptors.request.use(function (config) {
 axios.interceptors.response.use(function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
-    if (response.data.code === 2) {
+    const res = response.data //后端返回的
+    const token = response.headers.authorization
+    token && localStorage.setItem("token",token)
+    if (res?.code === 2) {
         ElMessage({
             message: '出错了:' + response.data.msg,
             type: 'error',
@@ -63,6 +70,11 @@ axios.interceptors.response.use(function (response) {
     }
     return response;
 }, function (error) {
+    const status = error?.response?.status 
+    if (status && status===401) {
+        localStorage.removeItem("token")
+        window.location.href = "#/login"
+    }
     if (errResponseCode.includes(error.code)) {
         ElMessage({
             message: error.message,
